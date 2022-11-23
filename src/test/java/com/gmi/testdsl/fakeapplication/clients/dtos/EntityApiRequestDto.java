@@ -1,16 +1,14 @@
 package com.gmi.testdsl.fakeapplication.clients.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
-@Data
-@Builder
+@Getter
+@Builder()
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EntityApiRequestDto {
 
     @NotNull
@@ -20,5 +18,6 @@ public class EntityApiRequestDto {
     Long projectId;
 
     @NotNull
+    @JsonProperty("strVal")
     String step;
 }

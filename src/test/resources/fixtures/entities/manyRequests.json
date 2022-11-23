@@ -1,0 +1,12 @@
+{
+  "firstOne": {
+    "productSlug": "a slug",
+    "strVal": "a step",
+    "projectId": 12345
+  },
+  "secondOne": {
+    "productSlug": "another slug",
+    "strVal": "another step",
+    "projectId": 67890
+  }
+}

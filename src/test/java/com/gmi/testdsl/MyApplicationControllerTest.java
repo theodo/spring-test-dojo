@@ -2,6 +2,7 @@
 package com.gmi.testdsl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gmi.testdsl.fakeapplication.clients.dtos.EntityApiRequestDto;
 import com.gmi.testdsl.fakeapplication.clients.dtos.EntityApiResponseDto;
 import com.gmi.testdsl.fakeapplication.controllers.dtos.MyApiRequestDto;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,6 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 
+import static com.gmi.testdsl.fixtures.entities.EntityLoader.*;
+import static com.gmi.testdsl.fixtures.myapi.MyApiLoader.myApiRequest;
+import static com.gmi.testdsl.mocks.Expectation.onPOST;
+import static com.gmi.testdsl.mocks.RestCall.doPOST;
 import static com.gmi.testdsl.servers.MockServers.getEntityServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -52,7 +57,7 @@ public class MyApplicationControllerTest {
     void testTechnicalWay() throws Exception {
         String requestDto = "{" +
                 "\"productSlug\":\"a slug\"," +
-                "\"step\":\"first step\"," +
+                "\"strVal\":\"first step\"," +
                 "\"projectId\":12345}";
 
         aMockServer
@@ -91,6 +96,37 @@ public class MyApplicationControllerTest {
                 .andExpect(jsonPath("$.productId").value(12345L))
                 .andExpect(jsonPath("$.status").value("an output"));
 
+
+    }
+
+    @Test
+    void testShortWay() throws Exception {
+
+        onPOST(aMockServer, "/v1/entity", entityRequest("oneRequest.json"))
+                .succeed(entityResponse("oneResponse.json"));
+
+        doPOST(mockMvc, "/myApi", myApiRequest("simpleApiRequest.json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.slug").value("a slug"))
+                .andExpect(jsonPath("$.productId").value(12345L))
+                .andExpect(jsonPath("$.status").value("an output"));
+
+    }
+
+    @Test
+    void testMultipleFixtures() throws Exception {
+
+        EntityRequests manyRequests = entityRequests("manyRequests.json");
+        EntityApiRequestDto oneRequest = manyRequests.get("firstOne");
+
+        onPOST(aMockServer, "/v1/entity", oneRequest)
+                .succeed(entityResponse("oneResponse.json"));
+
+        doPOST(mockMvc, "/myApi", myApiRequest("simpleApiRequest.json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.slug").value("a slug"))
+                .andExpect(jsonPath("$.productId").value(12345L))
+                .andExpect(jsonPath("$.status").value("an output"));
 
     }
 }
